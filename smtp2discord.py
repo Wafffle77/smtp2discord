@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import aiohttp, pyrfc6266, mimetypes, signal, argparse, yarl
 from aiosmtpd.controller import Controller
 from aiosmtpd.handlers import AsyncMessage
