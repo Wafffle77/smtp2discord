@@ -1,0 +1,6 @@
+/.venv
+/.vscode
+/dead.letter
+/test.txt
+*.eml
+__pycache__
