@@ -2,7 +2,7 @@ from smtp2discord import Smtp2DiscordController, Smtp2DiscordHandler
 from glob import glob
 import smtplib, aiohttp, asyncio
 
-WEBHOOK_URL = "https://discord.com/api/webhooks/1119657878375108608/z6jN5qkCjhfB82GeuMnlR2ZI9G1VJfBLQVzm4QFXGFfPqrvxiu5h1Zjgk5504gh8jzhC"
+from secret import WEBHOOK_URL
 
 async def deleteHandlerMessages(handler):
   async with aiohttp.ClientSession() as session:

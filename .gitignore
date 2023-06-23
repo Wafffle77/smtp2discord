@@ -4,3 +4,4 @@
 /test.txt
 *.eml
 __pycache__
+secret.py
