@@ -6,6 +6,7 @@ from aiosmtpd.handlers import AsyncMessage
 from aiosmtpd.smtp import SMTP
 from email.message import Message
 from subprocess import check_output
+import os
 
 def getContentType(msg: Message, fileCmd="file"):
   # Just return the content type if it is already specified
@@ -169,12 +170,25 @@ class Smtp2DiscordController(Controller):
 def parseArgs(args = None):
   parser = argparse.ArgumentParser()
 
-  parser.add_argument("webhook",          action="store",      type=yarl.URL,            help="Webhook URL to forward messages to")
-  parser.add_argument("-b", "--bind",     action="store",      type=str,                 help="Address to bind the SMTP server to",           default="127.0.0.1")
-  parser.add_argument("-p", "--port",     action="store",      type=int,                 help="Port for the SMTP server to listen on",        default=25)
-  parser.add_argument("-H", "--headers",  action="store_true",                           help="Send the headers of each email as an additional attachment")
-  parser.add_argument("-f", "--file-cmd", action="store",      type=str, dest="fileCmd", help="Path to an executable for the 'file' command", default="file")
-  parser.add_argument("-a", "--attach",   action="store_true",                           help="Attach a copy of the original email to the message")
+  WEBHOOK = os.environ.get("WEBHOOK", None)
+  FILE_CMD = os.environ.get("FILE_COMMAND", "file")
+  BIND = os.environ.get("BIND", "127.0.0.1")
+
+  # Additional error checking for type conversion
+  SEND_HEADERS = os.environ.get("SEND_HEADERS", "False").lower() in ('true', '1', 't')
+  ATTACH = os.environ.get("ATTACH", "False").lower() in ('true', '1', 't')
+  try:
+    PORT = int(os.environ.get("PORT", 25))
+  except ValueError:
+    print("Invalid type provided for PORT. Using default 25")
+    PORT = 25
+
+  parser.add_argument("webhook",          action="store",      type=yarl.URL,            help="Webhook URL to forward messages to", default=WEBHOOK, nargs="?" if WEBHOOK else 1) # Allow exclusion of positional argument where environment variable set
+  parser.add_argument("-b", "--bind",     action="store",      type=str,                 help="Address to bind the SMTP server to",           default=BIND)
+  parser.add_argument("-p", "--port",     action="store",      type=int,                 help="Port for the SMTP server to listen on",        default=PORT)
+  parser.add_argument("-H", "--headers",  action="store_true",                           help="Send the headers of each email as an additional attachment", default=SEND_HEADERS)
+  parser.add_argument("-f", "--file-cmd", action="store",      type=str, dest="fileCmd", help="Path to an executable for the 'file' command", default=FILE_CMD)
+  parser.add_argument("-a", "--attach",   action="store_true",                           help="Attach a copy of the original email to the message", default=ATTACH)
 
   return parser.parse_args(args)
 
